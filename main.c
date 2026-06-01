@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -94,7 +94,7 @@ void inicializarParque(struct Parque* parque)
     parque->headUsuarios = (struct NodoUsuario*)malloc(sizeof(struct NodoUsuario));
     if (parque->headUsuarios == NULL)
     {
-        printf("error al asignar memoria");
+        printf("error al asignar memoria\n");
         return;
     }
     parque->headUsuarios->datosUsuario = NULL;
@@ -127,12 +127,14 @@ struct Usuario* crearUsuario(char* nombre, int id, int edad, int estaEnParque, i
     if (usuarioNuevo == NULL)
     {
         printf("Error al asignar memoria. \n");
+        return NULL;
     }
     /*asignar memoria para el nombre del nuevoUsuario y validar malloc*/
     usuarioNuevo->nombre = (char*)malloc(strlen(nombre) + 1);
     if (usuarioNuevo->nombre == NULL)
     {
         printf("Error al asignar memoria. \n");
+        return NULL;
     }
     /*copiar el string de nombre y asignarlo al nuevoUsuario*/
     strcpy(usuarioNuevo->nombre, nombre);
@@ -362,7 +364,7 @@ struct Entrada* crearEntrada(int valor, int tipo, int estado)
     entradaNueva->headUsuarios = (struct NodoUsuarioEntrada*)malloc(sizeof(struct NodoUsuarioEntrada));
     if (entradaNueva->headUsuarios == NULL)
     {
-        printf("error al asignar memoria");
+        printf("error al asignar memoria\n");
         return NULL;
     }
 
@@ -562,7 +564,7 @@ void listarTodosLosUsuarios(struct Parque* parque)
     struct NodoUsuario* rec = parque->headUsuarios->sig;
     while (rec != NULL)
     {
-        printf("\nUsuario %d: ", i);
+        printf("\nUsuario %d\n: ", i);
         listarUsuario(rec->datosUsuario);
         i++;
         rec = rec->sig;
@@ -635,12 +637,27 @@ char* obtenerEstadoEntrada(int estado)
 }
 
 /* funcion para listar entradas de forma individual*/
-void listarEntrada(struct Entrada* entrada)
+void listarEntrada(struct Entrada *entrada)
 {
-    printf("| Id : %d ", entrada->id);
-    printf("| Valor : %d ", entrada->valor);
-    printf("| Tipo : %s", obtenerTipoEntrada(entrada->tipo));
-    printf("| Estado : %s", obtenerEstadoEntrada(entrada->estado));
+    printf("| Id : %d\n", entrada->id);
+    printf("| Valor : %d\n", entrada->valor);
+    printf("| Tipo : %s\n", obtenerTipoEntrada(entrada->tipo));
+    printf("| Estado : %s\n", obtenerEstadoEntrada(entrada->estado));
+    printf("-----------------------------\n");
+    struct NodoUsuarioEntrada* rec = entrada->headUsuarios->sig;
+    if (rec == NULL)
+    {
+        printf("no hay usuarios asociados a esta entrada\n");
+        printf("-----------------------------\n");
+        return;
+    }
+    printf("Usuarios asociados a esta entrada: \n");
+    while (rec != NULL)
+    {
+        printf("Id: %d | Nombre: %s\n", rec->datosUsuario->id, rec->datosUsuario->nombre);
+        rec = rec->sig;
+    }
+    printf("-----------------------------\n");
 }
 
 /*funcion para listar TODAS las entradas con recorrido INORDER por el ABB*/
@@ -686,9 +703,13 @@ void mostrarZona(struct Zona* zona, struct Parque* parque)
     {
         if (parque->zonas[i] == zona)
         {
-            printf("Zona %d Nombre : %s,Codigo: %d,Horario: %s,Tematica: %s,OcupacionActual: %d, CapacidadMax:%d\n",
-                   i + 1, zona->nombre, zona->codigo, zona->horario, zona->tematica, zona->ocupacionActual,
-                   zona->capacidadMax);
+            printf("nombre: %s\n", zona->nombre);
+            printf("codigo: %d\n", zona->codigo);
+            printf("horario: %s\n", zona->horario);
+            printf("tematica: %s\n", zona->tematica);
+            printf("ocupacion actual: %d\n", zona->ocupacionActual);
+            printf("capacidad maxima: %d\n", zona->capacidadMax);
+            printf("-----------------------------\n");
             return;
         }
     }
@@ -873,9 +894,10 @@ void listarFilaAtraccion(struct Atraccion* atraccion)
     struct NodoFila* rec;
     int i;
 
+
     if (atraccion->headFila == NULL)
     {
-        printf("la fila de esta atraccion esta vacia");
+        printf("la fila de esta atraccion esta vacia\n");
         return;
     }
 
@@ -972,6 +994,13 @@ int validarUsuarioSiPuedeFila(struct Parque* parque, struct Atraccion* atraccion
     struct Atraccion* dondeEstaUsuario;
     int opcionMover;
     struct Usuario* usuario = buscarUsuarioPorId(parque, id);
+
+
+    if (usuario == NULL)
+    {
+        printf("usuario no existe\n");
+        return 0;
+    }
 
     if (usuario->estaEnParque == 0)
     {
@@ -1391,7 +1420,7 @@ void agregarZona(struct Parque* parque)
 
     if (parque->cantidadZonas >= MAX_ZONAS)
     {
-        printf("no se pueden agregar mas zonas");
+        printf("no se pueden agregar mas zonas\n");
         return;
     }
 
@@ -1421,7 +1450,7 @@ void agregarZona(struct Parque* parque)
 
     do
     {
-        printf("ingrese el horario de la zona(ej:09:00-18:00)");
+        printf("ingrese el horario de la zona(ej:09:00-18:00) ");
         scanf(" %99[^\n]", horario);
 
         if (validarHorarioZona(horario) == 0)
@@ -1464,7 +1493,7 @@ int calcularOcupacionZona(struct Zona* zona)
     struct NodoAtraccion* rec;
     if (zona == NULL)
     {
-        printf("Error zona invalida");
+        printf("Error zona invalida\n");
         return 0;
     }
     /*nodo fantasma*/
@@ -1485,12 +1514,6 @@ int calcularOcupacionZona(struct Zona* zona)
 void cambiarEstadoEntrada(struct Entrada* entrada, int nuevoEstado)
 {
     entrada->estado = nuevoEstado;
-}
-
-/*funcion que recibe una entrada y un int del nuevo id, cambia el id actual de la entrada al id recibido*/
-void cambiarIdEntrada(struct Entrada* entrada, int nuevoId)
-{
-    entrada->id = nuevoId;
 }
 
 /*funcion que recibe una entrada y un int del nuevo valor, cambia el valor actual de la entrada al valor recibido*/
@@ -1638,14 +1661,14 @@ void usarEntrada(struct Entrada* entrada, struct Usuario* usuario)
     /*verificar si la entrada existe*/
     if (entrada == NULL)
     {
-        printf("La entrada no existe!");
+        printf("La entrada no existe!\n");
         return;
     }
 
     /*verificar si la entrada ya esta activa*/
     if (entrada->estado == 1)
     {
-        printf("La entrada ya esta activada!");
+        printf("La entrada ya esta activada!\n");
         return;
     }
 
@@ -1661,7 +1684,7 @@ int contarEntradasUsadas(struct NodoEntrada* raizEntrada)
     }
     if (raizEntrada->datosEntrada != NULL)
     {
-        if (raizEntrada->datosEntrada->estado == 2)
+        if (raizEntrada->datosEntrada->estado == 2 || raizEntrada->datosEntrada->estado == 3)
         {
             return 1 + contarEntradasUsadas(raizEntrada->izq) + contarEntradasUsadas(raizEntrada->der);
         }
@@ -1935,7 +1958,7 @@ void menuEliminarZona(struct Parque* parque)
     int codigo;
     if (parque == NULL)
     {
-        printf("Parque no valido");
+        printf("Parque no valido\n");
         return;
     }
     printf("Ingrese el Codigo de la zona que desea eliminar : \n");
@@ -2018,7 +2041,7 @@ void menuModificarUsuario(struct Parque* parque)
 
     if (usuarioModificar == NULL)
     {
-        printf("Usuario con id: %d no encontrado.", id);
+        printf("Usuario con id: %d no encontrado.\n", id);
         return;
     }
 
@@ -2134,7 +2157,7 @@ struct Entrada* menuBuscarEntradaPorId(struct Parque* parque)
     }
     else
     {
-        printf("Entrada con id: %d no existe!", idtmp);
+        printf("Entrada con id: %d no existe!\n", idtmp);
         return NULL;
     }
 }
@@ -2142,9 +2165,9 @@ struct Entrada* menuBuscarEntradaPorId(struct Parque* parque)
 void menuListarEntradas(struct Parque* parque)
 {
     int selectmp;
-    printf("1. Listar todas las entradas del sistema");
-    printf("2. Listar entrada individual");
-    printf("\n Porfavor digite una opcion valida del menu: ");
+    printf("1. Listar todas las entradas del sistema\n");
+    printf("2. Listar entrada individual\n");
+    printf("Porfavor digite una opcion valida del menu: ");
     scanf(" %d", &selectmp);
     if (selectmp == 1)
     {
@@ -2185,6 +2208,7 @@ void menuCambiarEstadoEntrada(struct Parque* parque)
 
 void menuModificarEntrada(struct Parque* parque)
 {
+    listarTodasLasEntradas(parque);
     struct Entrada* buscadotmp = menuBuscarEntradaPorId(parque);
     if (buscadotmp == NULL)
     {
@@ -2294,7 +2318,6 @@ void menuCerrarParque(struct Parque *parque) {
     printf("========================================\n");
 
     printf("Visitantes que ingresaron hoy:  %d\n", parque->visitantesHoy);
-    printf("Visitantes dentro del parque:   %d\n", contarVisitantesEnParque(parque->headUsuarios));
     printf("Visitantes totales del dia:     %d\n", contarVisitantesTotales(parque->headUsuarios));
     printf("Entradas vendidas:              %d\n", contarEntradasVendidas(parque->raizEntradas->izq));
     printf("Entradas usadas:                %d\n", contarEntradasUsadas(parque->raizEntradas->izq));
@@ -2319,6 +2342,7 @@ void menuFlujoUsuarios(struct Parque* parque)
 
 void menuAgregarUsuarioAEntrada(struct Parque* parque)
 {
+    struct NodoUsuarioEntrada *rec;
     printf("entradas disponibles: \n");
     listarTodasLasEntradas(parque->raizEntradas->izq);
 
@@ -2329,8 +2353,12 @@ void menuAgregarUsuarioAEntrada(struct Parque* parque)
     }
     else
     {
+        rec = buscadotmp->headUsuarios->sig;
         int selectmp;
-        printf("Agregar usuario existente o nuevo: \n1. Existente\n2. Nuevo");
+        printf("Agregar usuario existente o nuevo:\n");
+        printf("1. existente\n");
+        printf("2. nuevo\n");
+        printf("opcion: ");
         scanf("%d", &selectmp);
         if (selectmp < 1 || selectmp > 2)
         {
@@ -2341,19 +2369,31 @@ void menuAgregarUsuarioAEntrada(struct Parque* parque)
         {
             int idBuscar;
 
-            printf("usuarios disponibles: \n");
+
             listarTodosLosUsuarioSimple(parque);
 
             printf("Ingrese el id del usuario: ");
             scanf("%d", &idBuscar);
+
             struct Usuario* usuariotmp = buscarUsuarioPorId(parque, idBuscar);
+
             if (usuariotmp == NULL)
             {
-                printf("usuario no encontrado");
+                printf("usuario no encontrado\n");
                 return;
             }
+
+            while (rec != NULL)
+            {
+                if (usuariotmp->id == rec->datosUsuario->id)
+                {
+                    printf("el usuario ya se encuentra en la fila!\n");
+                    return;
+                }
+            }
+
             agregarUsuarioEntrada(buscadotmp, usuariotmp);
-            printf("usuario agregado correctamente a la entrada %d", buscadotmp->id);
+            printf("usuario agregado correctamente a la entrada %d\n", buscadotmp->id);
         }
         else if (selectmp == 2)
         {
@@ -2447,7 +2487,7 @@ void menuListarAtracciones(struct Parque* parque)
     printf("zonas disponibles: \n");
     listarZonasSimple(parque);
 
-    printf("ingrese el codigo de la zona que desea listar sus atracciones");
+    printf("ingrese el codigo de la zona que desea listar sus atracciones: ");
     scanf(" %d", &zonaCode);
 
     zonaBuscada = buscarZonaPorCodigo(parque, zonaCode);
@@ -2532,7 +2572,7 @@ void menuModificarAtraccion(struct Parque* parque)
 
     do
     {
-        printf("modificando atraccion de codigo %d:", atraccionBuscada->codigo);
+        printf("modificando atraccion de codigo %d:\n", atraccionBuscada->codigo);
         printf("1. nombre\n");
         printf("2. capacidad maxima\n");
         printf("3. estado\n");
@@ -2561,7 +2601,7 @@ void menuModificarAtraccion(struct Parque* parque)
         {
             if (opcion != 4)
             {
-                printf("tu opcion es invalida");
+                printf("tu opcion es invalida\n");
             }
         }
     }
@@ -2590,7 +2630,7 @@ void menuAgregarUsuarioAFila(struct Parque* parque)
 
     if (zonaBuscada == NULL)
     {
-        printf("la zona de codigo %d, no existe.", codigoZona);
+        printf("la zona de codigo %d, no existe.\n", codigoZona);
         return;
     }
 
@@ -2604,7 +2644,7 @@ void menuAgregarUsuarioAFila(struct Parque* parque)
 
     if (atraccionBuscada == NULL)
     {
-        printf("la atraccion de codigo %d no existe", codigoAtraccion);
+        printf("la atraccion de codigo %d no existe\n", codigoAtraccion);
         return;
     }
 
@@ -2656,21 +2696,21 @@ void menuListarFilaAtraccion(struct Parque* parque)
 
     if (zonaBuscada == NULL)
     {
-        printf("la zona de codigo %d, no existe.", codigoZona);
+        printf("la zona de codigo %d, no existe.\n", codigoZona);
         return;
     }
 
     printf("atracciones disponibles en la zona %d: \n", codigoZona);
     listarAtraccionesSimple(zonaBuscada->headAtracciones);
 
-    printf("ingrese el codigo de la atraccion a la que desea ingresar el usuario: ");
+    printf("ingrese el codigo de la atraccion: ");
     scanf(" %d", &codigoAtraccion);
 
     atraccionBuscada = buscarAtraccionPorCodigo(zonaBuscada->headAtracciones, codigoAtraccion);
 
     if (atraccionBuscada == NULL)
     {
-        printf("la atraccion de codigo %d no existe", codigoAtraccion);
+        printf("la atraccion de codigo %d no existe\n", codigoAtraccion);
         return;
     }
 
@@ -2696,21 +2736,21 @@ void menuBuscarUsuarioEnFila(struct Parque* parque)
 
     if (zonaBuscada == NULL)
     {
-        printf("la zona de codigo %d, no existe.", codigoZona);
+        printf("la zona de codigo %d, no existe.\n", codigoZona);
         return;
     }
 
     printf("atracciones disponibles en la zona %d: \n", codigoZona);
     listarAtraccionesSimple(zonaBuscada->headAtracciones);
 
-    printf("ingrese el codigo de la atraccion a la que desea ingresar el usuario: ");
+    printf("ingrese el codigo de la atraccion: ");
     scanf(" %d", &codigoAtraccion);
 
     atraccionBuscada = buscarAtraccionPorCodigo(zonaBuscada->headAtracciones, codigoAtraccion);
 
     if (atraccionBuscada == NULL)
     {
-        printf("la atraccion de codigo %d no existe", codigoAtraccion);
+        printf("la atraccion de codigo %d no existe\n", codigoAtraccion);
         return;
     }
 
@@ -2753,21 +2793,21 @@ void menuIniciarVueltaAtraccion(struct Parque* parque)
 
     if (zonaBuscada == NULL)
     {
-        printf("la zona de codigo %d, no existe.", codigoZona);
+        printf("la zona de codigo %d, no existe.\n", codigoZona);
         return;
     }
 
     printf("atracciones disponibles en la zona %d: \n", codigoZona);
     listarAtraccionesSimple(zonaBuscada->headAtracciones);
 
-    printf("ingrese el codigo de la atraccion a la que desea ingresar el usuario: ");
+    printf("ingrese el codigo de la atraccion: ");
     scanf(" %d", &codigoAtraccion);
 
     atraccionBuscada = buscarAtraccionPorCodigo(zonaBuscada->headAtracciones, codigoAtraccion);
 
     if (atraccionBuscada == NULL)
     {
-        printf("la atraccion de codigo %d no existe", codigoAtraccion);
+        printf("la atraccion de codigo %d no existe\n", codigoAtraccion);
         return;
     }
 
@@ -2815,21 +2855,21 @@ void menuTerminarVueltaAtraccion(struct Parque* parque)
 
     if (zonaBuscada == NULL)
     {
-        printf("la zona de codigo %d, no existe.", codigoZona);
+        printf("la zona de codigo %d, no existe.\n", codigoZona);
         return;
     }
 
     printf("atracciones disponibles en la zona %d: \n", codigoZona);
     listarAtraccionesSimple(zonaBuscada->headAtracciones);
 
-    printf("ingrese el codigo de la atraccion a la que desea ingresar el usuario: ");
+    printf("ingrese el codigo de la atraccion: ");
     scanf(" %d", &codigoAtraccion);
 
     atraccionBuscada = buscarAtraccionPorCodigo(zonaBuscada->headAtracciones, codigoAtraccion);
 
     if (atraccionBuscada == NULL)
     {
-        printf("la atraccion de codigo %d no existe", codigoAtraccion);
+        printf("la atraccion de codigo %d no existe\n", codigoAtraccion);
         return;
     }
 
@@ -2901,7 +2941,7 @@ void menuCalcularEntradasVendidas(struct Parque* parque)
         return;
     }
     contador = contarEntradasVendidas(parque->raizEntradas->izq);
-    printf("La cantidad de entradas vendidas en el dia son: %d", contador);
+    printf("La cantidad de entradas vendidas en el dia son: %d\n", contador);
     return;
 }
 
@@ -2914,7 +2954,7 @@ void menuCalcularEntradasUsadas(struct Parque* parque)
         return;
     }
     entradasUsadas = contarEntradasUsadas(parque->raizEntradas->izq);
-    printf("La cantidad de entradas usadas hoy son: %d", entradasUsadas);
+    printf("La cantidad de entradas usadas hoy son: %d\n", entradasUsadas);
     return;
 }
 
@@ -2942,7 +2982,7 @@ void menuListarAtraccionesNoOperativas(struct Parque* parque)
     AtraccionesNoOperativas = listarAtraccionesMalas(zona->headAtracciones, &cantMalas);
     if (cantMalas == 0)
     {
-        printf("No hay atracciones No operativas en esta zona");
+        printf("No hay atracciones No operativas en esta zona\n");
         return;
     }
     if (AtraccionesNoOperativas == NULL)
@@ -2985,7 +3025,7 @@ void menuVisitantesEnParque(struct Parque* parque)
         return;
     }
     enParque = contarVisitantesEnParque(parque->headUsuarios);
-    printf("La cantidad  de visitantes dentro del parque es: %d ", enParque);
+    printf("La cantidad de visitantes dentro del parque es: %d\n", enParque);
     return;
 }
 
@@ -3307,7 +3347,7 @@ void menuIBCLandia(struct Parque* parque)
         switch (num)
         {
         default:
-            printf("opcion no valida, mejor suerte a la proxima!");
+            printf("opcion no valida, mejor suerte a la proxima!\n");
             break;
         case 1:
             menuUsuarios(parque);
@@ -3331,7 +3371,7 @@ void menuIBCLandia(struct Parque* parque)
             menuCerrarParque(parque);
             break;
         case 8:
-            printf("Esperamos hayas disfrutado de IBCLandia!");
+            printf("Esperamos hayas disfrutado de IBCLandia!\n");
             break;
         }
     }
@@ -3345,7 +3385,7 @@ int main(void)
 
     if (parque == NULL)
     {
-        printf("No se pudo crear el parque.");
+        printf("No se pudo crear el parque.\n");
         return 0;
     }
     srand(time(NULL));
