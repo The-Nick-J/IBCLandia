@@ -1,6 +1,6 @@
 # IBCLandia
-Proyecto para Estructura de Datos, Pontificia Universidad Católica de Valparaíso.
-Github FINAL, todo para la entrega de la Evaluacion Modular #3.
+Proyecto para Estructura de Datos, Pontificia Universidad Católica de Valparaíso. \n
+Github FINAL, todo para la entrega de la Evaluacion Modular #3. \n
 INTEGRANTES:
   -Nicolas Jaramillo
   -Ethan Troncoso
