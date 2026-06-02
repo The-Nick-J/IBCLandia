@@ -12,5 +12,4 @@ INTEGRANTES:
   -Lucas Ahumada
 
 
-<img width="2124" height="1149" alt="image" src="https://github.com/user-attachments/assets/2e502d9b-9469-4893-80db-830cb2e93668" />
-#dibujo no representa la estructura final del archivo
+<i
